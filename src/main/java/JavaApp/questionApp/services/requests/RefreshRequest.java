@@ -7,8 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class LikeCreateRequest {
-    Long id;
+public class RefreshRequest{
     Long userId;
-    Long postId;
+    String refreshToken;
 }

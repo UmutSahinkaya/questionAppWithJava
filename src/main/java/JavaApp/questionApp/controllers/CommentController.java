@@ -4,6 +4,7 @@ import JavaApp.questionApp.entities.Comment;
 import JavaApp.questionApp.services.CommentService;
 import JavaApp.questionApp.services.requests.CommentCreateRequest;
 import JavaApp.questionApp.services.requests.CommentUpdateRequest;
+import JavaApp.questionApp.services.response.CommentResponse;
 import lombok.AllArgsConstructor;
 import org.hibernate.annotations.Comments;
 import org.springframework.web.bind.annotation.*;
@@ -11,30 +12,36 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 
-@RestController
 @AllArgsConstructor
+@RestController
 @RequestMapping("/comments")
 public class CommentController {
-    private CommentService _service;
+
+    private CommentService commentService;
 
     @GetMapping
-    public List<Comment> getAllComments(@RequestParam Optional<Long> userId, @RequestParam Optional<Long> postId){
-        return  _service.getAllCommentsWithParam(userId,postId);
+    public List<CommentResponse> getAllComments(@RequestParam Optional<Long> userId,
+                                                @RequestParam Optional<Long> postId) {
+        return commentService.getAllCommentsWithParam(userId, postId);
     }
-    @GetMapping("/{commentId}")
-    public Comment getOneComment(@PathVariable Long commentId){
-        return _service.getOneCommentById(commentId);
-    }
+
     @PostMapping
-    public Comment createOneComment(@RequestBody CommentCreateRequest commentCreateRequest){
-        return _service.createOneComment(commentCreateRequest);
+    public Comment createOneComment(@RequestBody CommentCreateRequest request) {
+        return commentService.createOneComment(request);
     }
+
+    @GetMapping("/{commentId}")
+    public Comment getOneComment(@PathVariable Long commentId) {
+        return commentService.getOneCommentById(commentId);
+    }
+
     @PutMapping("/{commentId}")
-    public Comment updateOneComment(@PathVariable Long commentId,@RequestBody CommentUpdateRequest commentUpdateRequest){
-        return _service.updateOneCommentById(commentId,commentUpdateRequest);
+    public Comment updateOneComment(@PathVariable Long commentId, @RequestBody CommentUpdateRequest request) {
+        return commentService.updateOneCommentById(commentId, request);
     }
+
     @DeleteMapping("/{commentId}")
-    public void deleteOneComment(@PathVariable Long commentId){
-        _service.deleteOneCommentById(commentId);
+    public void deleteOneComment(@PathVariable Long commentId) {
+        commentService.deleteOneCommentById(commentId);
     }
 }

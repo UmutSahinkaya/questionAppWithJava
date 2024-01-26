@@ -1,59 +1,64 @@
 package JavaApp.questionApp.services;
 
-import JavaApp.questionApp.entities.Comment;
 import JavaApp.questionApp.entities.Like;
 import JavaApp.questionApp.entities.Post;
 import JavaApp.questionApp.entities.User;
 import JavaApp.questionApp.repos.LikeRepository;
 import JavaApp.questionApp.services.requests.LikeCreateRequest;
-import JavaApp.questionApp.services.requests.LikeUpdateRequest;
-import lombok.AllArgsConstructor;
+import JavaApp.questionApp.services.response.LikeResponse;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
-@AllArgsConstructor
 public class LikeService {
-    private LikeRepository _repository;
-    private UserService _userService;
-    private PostService _postService;
-    public List<Like> getAllLikesWithParam(Optional<Long> postId, Optional<Long> userId) {
-        if(userId.isPresent() && postId.isPresent()){
-            return _repository.findByUserIdAndPostId(userId.get(),postId.get());
-        }else if(userId.isPresent()){
-            return _repository.findByUserId(userId.get());
-        } else if (postId.isPresent()) {
-            return _repository.findByPostId(postId.get());
-        }
-        else return _repository.findAll();
+
+    private LikeRepository likeRepository;
+    private UserService userService;
+    private PostService postService;
+
+    public LikeService(LikeRepository likeRepository, UserService userService,
+                       PostService postService) {
+        this.likeRepository = likeRepository;
+        this.userService = userService;
+        this.postService = postService;
     }
 
-    public Like getOneLikeById(Long likeId) {
-        return _repository.findById(likeId).orElse(null);
+    public List<LikeResponse> getAllLikesWithParam(Optional<Long> userId, Optional<Long> postId) {
+        List<Like> list;
+        if(userId.isPresent() && postId.isPresent()) {
+            list = likeRepository.findByUserIdAndPostId(userId.get(), postId.get());
+        }else if(userId.isPresent()) {
+            list = likeRepository.findByUserId(userId.get());
+        }else if(postId.isPresent()) {
+            list = likeRepository.findByPostId(postId.get());
+        }else
+            list = likeRepository.findAll();
+        return list.stream().map(like -> new LikeResponse(like)).collect(Collectors.toList());
     }
 
-    public Like createOneLike(LikeCreateRequest likeCreateRequest) {
-        User user =_userService.getOneUserById(likeCreateRequest.getUserId());
-        Post post=_postService.getOnePostById(likeCreateRequest.getPostId());
-        if (user != null && post != null){
-            Like likeToSave=new Like();
-            likeToSave.setId(likeCreateRequest.getId());
+    public Like getOneLikeById(Long LikeId) {
+        return likeRepository.findById(LikeId).orElse(null);
+    }
+
+    public Like createOneLike(LikeCreateRequest request) {
+        User user = userService.getOneUserById(request.getUserId());
+        Post post = postService.getOnePostById(request.getPostId());
+        if(user != null && post != null) {
+            Like likeToSave = new Like();
+            likeToSave.setId(request.getId());
             likeToSave.setPost(post);
             likeToSave.setUser(user);
-            return _repository.save(likeToSave);
-        }else return null;
+            return likeRepository.save(likeToSave);
+        }else
+            return null;
     }
 
-    public Like updateOneLikeById(Long likeId, LikeUpdateRequest likeUpdateRequest) {
-        Optional<Like> like=_repository.findById(likeId);
-        if(like.isPresent()){
-            Like likeToUpdate=like.get();
-            return _repository.save(likeToUpdate);
-        }else return null;
-    }
     public void deleteOneLikeById(Long likeId) {
-        _repository.deleteById(likeId);
+        likeRepository.deleteById(likeId);
     }
+
+
 }

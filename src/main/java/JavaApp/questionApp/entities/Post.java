@@ -8,28 +8,29 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
-@Entity
-@Data
+import java.util.Date;
+
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "posts")
+@Entity
+@Table(name="posts")
+@Data
 public class Post {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id",nullable = false)
-    @OnDelete(action=OnDeleteAction.CASCADE)
-    @JsonIgnore
-    User User;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name="user_id", nullable=false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    User user;
 
+    String title;
     @Lob
-    @Column(columnDefinition = "text",name = "text")
+    @Column(columnDefinition="text")
     String text;
 
-    @Lob
-    @Column(name = "title")
-    String title;
-
+    @Temporal(TemporalType.TIMESTAMP)
+    Date createDate;
 }

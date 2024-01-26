@@ -10,22 +10,15 @@ import org.hibernate.annotations.OnDeleteAction;
 
 import java.util.Date;
 
-@Entity
-@Data
-@NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "comments")
-public class Comment {
-
+@NoArgsConstructor
+@Entity
+@Table(name="refresh_token")
+@Data
+public class RefreshToken {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="post_id", nullable=false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    @JsonIgnore
-    Post post;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="user_id", nullable=false)
@@ -33,10 +26,10 @@ public class Comment {
     @JsonIgnore
     User user;
 
-    @Lob
-    @Column(columnDefinition="text")
-    String text;
+    @Column(nullable = false, unique = true)
+    String token;
 
+    @Column(nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
-    Date createDate;
+    Date expiryDate;
 }
